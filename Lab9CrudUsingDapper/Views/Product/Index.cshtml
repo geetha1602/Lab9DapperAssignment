@@ -1,0 +1,169 @@
+﻿@model Lab9CrudUsingDapper.Models.ProductViewModel
+@{
+    ViewData["Title"] = "Index";
+}
+<h3>Product Insert / Update</h3>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <form method="post" asp-area="" asp-controller="Product" asp-action="InsertUpdateProduct">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="ProductId" name="ProductId"/>
+                <div class="row mb-3">
+                    <div class="col-12"><label for="Name">Name</label></div>
+                    <div class="col-12"><input type="text" class="form-control" name="Name" id="Name" placeholder="Enter Name"></div>
+                </div>
+                 <div class="row mb-3">
+                    <div class="col-12"><label for="Category">Category</label></div>
+                    <div class="col-12"><input type="text" class="form-control" name="Category" id="Category" placeholder="Enter Category"></div>
+                 </div>
+                <div class="row mb-3">
+                    <div class="col-12"><label for="Color">Color</label></div>
+                    <div class="col-12"><input type="text" class="form-control" name="Color" id="Color" placeholder="Enter Color"></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-12"><label for="UnitPrice">Unit Price</label></div>
+                    <div class="col-12"><input type="text" class="form-control" name="UnitPrice" id="UnitPrice" placeholder="Enter UnitPrice"></div>
+                </div>
+                 <div class="row mb-3">
+                    <div class="col-12"><label for="AvailableQuantity">Quantity</label></div>
+                    <div class="col-12"><input type="text" class="form-control" name="AvailableQuantity" id="AvailableQuantity" placeholder="Enter Quantity"></div>
+                 </div>
+                 <div class="row mb-3">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-sm btn-success">Submit</button>
+                    </div>
+                 </div>
+            </form>
+            </div>
+    </div>
+</div>
+
+<div class="col-md-6">
+    @{
+        if (TempData["SuccessMsg"] != null)
+        {
+                <h2 class="bg-sucess">@TempData["SuccessMsg"]</h2>
+        }
+   }
+</div>
+
+<h3>Product List</h3>
+<div class="container">
+    <div class="row">
+        <div class="col-8 offset-2">
+            <table class="table table-bordered">
+                <tr class="text-center">
+                    <th>Product Id</th>
+                    <th>Product Name</th>
+                    <th>Category</th>
+                    <th>Color</th>
+                    <th>UnitPrice</th>
+                    <th>AvailableQuantity</th>
+                    <th>Action</th>
+                </tr>
+                @{
+                    if (Model.ProductsList != null && Model.ProductsList.Count > 0){
+                        foreach (var item in Model.ProductsList)
+                        {
+                                <tr class="text-center">
+                                    <td>@item.ProductId</td>
+                                    <td>@item.Name</td>
+                                    <td>@item.Category</td>
+                                    <td>@item.Color</td>
+                                    <td>@item.UnitPrice</td>
+                                    <td>@item.AvailableQuantity</td>
+                                    <td>
+                                    <div class="btn-group">
+                                        <a onclick="EditProduct('@item.ProductId','@item.Name','@item.Category','@item.Color','@item.UnitPrice','@item.AvailableQuantity')"
+                                           style="cursor:pointer" class="btn btn-sm btn-info">Edit</a> |
+                                        <a onclick="DeleteProduct('@item.ProductId')" style="cursor:pointer" class="btn btn-sm btn-danger m1-1">Delete</a>
+                                    </div>
+                                   
+                                    </td>
+                                </tr>
+                        }
+                    }
+                }
+                
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+
+        function DeleteProduct(ProductId) {
+            let response = confirm("Do you want delete this record");
+            if (response) {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("DeleteProduct","Product")',
+                    data: { ProductId: ProductId },
+                    success: function (response) {
+                        if (response.message == "Delete Sucessfully") {
+                            window.location.reload();
+                        }
+                        else {
+                            alert(response.message)
+                        }
+                    },
+                })
+            }
+        }
+          function EditProduct(ProductId, Name, Category, Color, UnitPrice, AvailableQuantity) {
+                $('#ProductId').val(ProductId);
+                $('#Name').val(Name);
+                $('#Category').val(Category);
+                $('#Color').val(Color);
+                $('#UnitPrice').val(UnitPrice);
+                $('#AvailableQuantity').val(AvailableQuantity);
+            }
+    </script>
+
+    <partial name="_ValidationScriptsPartial" />
+}
+@*
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
+    <script>
+                                                function DeleteProduct(ProductId) {
+                                                    let response = confirm("Do you want delete this record");
+
+                                                    if(response){
+                                                        $.ajax({
+                                                            type:"POST",
+                                                            url:'@Url.Action("DeleteProduct","Product")',
+                                                            data:{ProductId:ProductId},
+                                                            success: function(response){
+                                                                if(response.message=="Delete Sucessfully"){
+                                                                    window.location.reload();
+                                                                }
+                                                                else{
+                                                                    alert(response.message)
+                                                                }
+                                                            },
+                                                            complete: function(){}
+
+                                                        })
+                                                    }
+                                                }
+
+                                                 function EditProduct(ProductId, Name, Category, Color, UnitPrice, AvailableQuantity) {
+                $('#ProductId').val(ProductId);
+                $('#Name').val(Name);
+                $('#Category').val(Category);
+                $('#Color').val(Color);
+                $('#UnitPrice').val(UnitPrice);
+                $('#AvailableQuantity').val(AvailableQuantity);
+            }
+                                               
+    </script>
+   
+
+    }
+}
+*@
